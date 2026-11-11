@@ -1,91 +1,678 @@
-*{
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* ======================================================================
+   STYLE.CSS — TODA A APARÊNCIA DO PORTFÓLIO ANIMADO
+   ----------------------------------------------------------------------
+   Este arquivo é dividido exatamente nas partes mostradas durante a aula:
+     [EFEITO 1] Loading (spinner + fade de revelação)
+     [EFEITO 2] Revelação ao rolar (classe .reveal + delays .d1…d6)
+     [EFEITO 3] Botões animados no hover
+     [EFEITO 4] Cards de projeto animados no hover
+     [EFEITO 5] Acessibilidade (prefers-reduced-motion)
+   Antes deles: os "tokens" (variáveis globais) e os estilos gerais.
+   ====================================================================== */
+
+/* ----------------------------------------------------------------------
+   TOKENS DE DESIGN — variáveis CSS declaradas em :root
+   ----------------------------------------------------------------------
+   Por que usar variáveis? Porque mudamos UM valor aqui e o site inteiro
+   se atualiza (cores, tempos de animação, etc.). Além disso, nomes
+   legíveis (--accent) valem mais que códigos soltos (#00cc8f).
+   ---------------------------------------------------------------------- */
+:root {
+  --bg: #151721;                  /* cor de fundo geral da página */
+  --bg-soft: #1b1e2b;             /* fundo "leve" p/ áreas secundárias */
+  --card: #1e2130;                /* fundo dos cards (painéis) */
+  --line: rgba(159, 161, 173, .14); /* linhas e bordas quase invisíveis */
+  --accent: #00cc8f;              /* COR DE DESTAQUE (verde-turquesa) */
+  --accent-soft: rgba(0, 204, 143, .14);   /* versão transparente da cor */
+  --accent-strong: rgba(0, 204, 143, .34); /* versão mais intensa p/ brilhos */
+  --title: #f1f2f3;               /* cor dos títulos (quase branco) */
+  --text: #9fa1ad;                /* cor dos textos comuns (cinza) */
+  --radius: 16px;                 /* arredondamento padrão dos cantos */
+  --nav-h: 72px;                  /* altura do cabeçalho fixo */
+  --duration: .35s;               /* duração padrão das transições */
+  --ease: cubic-bezier(.4, 0, .2, 1);    /* curva "suave" (padrão) */
+  --pop: cubic-bezier(.34, 1.56, .64, 1); /* curva com leve "pulinho" */
 }
 
-html{
-    scroll-behavior: smooth;
+/* ----------------------------------------------------------------------
+   RESET E BASE — o terreno comum entre navegadores
+   ---------------------------------------------------------------------- */
+* {                              /* o asterisco pega TODOS os elementos */
+  margin: 0;                     /* zera margens externas */
+  padding: 0;                    /* zera preenchimentos internos */
+  box-sizing: border-box;        /* padding/borda não aumentam o tamanho final */
 }
 
-body{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    background-color: rgb(56, 55, 55);
-    color:rgb(165, 164, 164);
-    line-height: 1.6;
-    overflow-x: hidden;
+html {
+  scroll-behavior: smooth;       /* rolagem suave ao clicar em âncoras */
 }
 
-body.is-loading{overflow: hidden;}
-
-#loader{
-    position: fixed;
-    z-index: 9999;
-    background: #151721;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    transition: opacity .55s ease;
+body {
+  font-family: "Poppins", system-ui, sans-serif; /* fonte do corpo */
+  background-color: var(--bg);   /* aplica o fundo geral */
+  color: var(--text);            /* cor padrão do texto */
+  line-height: 1.6;              /* espaço entre linhas de texto */
+  overflow-x: hidden;            /* impede barra horizontal indesejada */
 }
 
-#loader.hidden{
-    opacity: 0;
-    pointer-events: none;
+body.is-loading { overflow: hidden; } /* trava a rolagem enquanto o loader está na tela */
+
+a {
+  color: inherit;                /* links herdam a cor do pai */
+  text-decoration: none;         /* remove o sublinhado padrão */
 }
 
-*{
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+svg { display: block; }          /* evita espaço extra abaixo de ícones SVG */
+
+/* Anel de foco visível SÓ para quem navega por teclado (acessibilidade) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
- 
-html{
-     scroll-behavior: smooth; /*rolagem suave */
+
+/* ----------------------------------------------------------------------
+   ESTRUTURA GERAL — largura e espaçamento das seções
+   ---------------------------------------------------------------------- */
+.container {
+  width: min(1120px, 92%);       /* no máximo 1120px, ou 92% da tela */
+  margin-inline: auto;           /* centraliza horizontalmente */
 }
- 
-body{
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    background-color: rgb(147, 147, 250);
-    color: rgb(196, 181, 211);
-    line-height: 1.6;
-     overflow: hidden; /*impede barra horizontal indesejada */
+
+.section {
+  padding-block: 96px 48px;      /* respiro: 96px acima, 48px abaixo */
+  position: relative;            /* referência p/ brilhos decorativos */
 }
- 
-body.is-loading{overflow: hidden;}
- 
-/* LOADING */
- 
-#loader{
-    position: fixed;
-    z-index: 9999;
-    background: #151721;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 18px;
-    transition: opacity .55s ease;
+
+/* Rótulo pequeno acima do título (ex.: "SOBRE mim") */
+.section__subtitle {
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .14em;         /* letras mais espaçadas… */
+  text-transform: uppercase;     /* …e tudo em maiúsculas */
+  color: var(--text);
+  margin-bottom: .4rem;
 }
- 
-#loader.hiden{
-    opacity: 0;
-    pointer-events: none;
- 
+.section__subtitle span {
+  color: var(--accent);          /* só o trecho destacado fica colorido */
 }
- 
-@keyframes spin{
-    from {transform: rotate(0deg);}
-    to {transform: rotate(360deg);}
+
+/* Título principal da seção */
+.section__title {
+  font-size: clamp(1.5rem, 3.4vw, 2rem); /* cresce com a tela, mas tem limites */
+  color: var(--title);
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
- 
-.spinner{
-    width: 50px;
-    height: 50px;
-    border: 4.5px solid black;
-    border-top-color:#00cc8f ;
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
+
+/* Texto corrido abaixo do título (largura máxima confortável) */
+.section__lead { max-width: 62ch; }
+
+/* ======================================================================
+   [EFEITO 1] LOADING
+   ----------------------------------------------------------------------
+   A tela escura cobre TUDO enquanto carrega. O spinner gira sem parar.
+   Quando o JS adiciona .hide, o opacity vai a 0 (com transition) e o
+   site aparece por baixo — efeito de "revelação".
+   ====================================================================== */
+#loader {
+  position: fixed;               /* preso à janela, não rola com a página */
+  inset: 0;                      /* atalho: top/right/bottom/left = 0 → cobre tudo */
+  z-index: 9999;                 /* camada mais alta que existe */
+  background: var(--bg);         /* mesmo fundo do site → transição discreta */
+  display: flex;                 /* organiza filho (spinner) + texto */
+  flex-direction: column;        /* coluna: spinner em cima do texto */
+  align-items: center;           /* centraliza na horizontal */
+  justify-content: center;       /* centraliza na vertical */
+  gap: 18px;                     /* distância entre spinner e texto */
+  transition: opacity .55s var(--ease); /* a famosa "fade out" */
 }
- 
+#loader.hide {                   /* estado aplicado pelo JavaScript */
+  opacity: 0;                    /* totalmente transparente… */
+  pointer-events: none;          /* …e "invisível" aos cliques */
+}
+
+/* O spinner: um círculo com apenas a parte de cima colorida */
+.spinner {
+  width: 46px;
+  height: 46px;
+  border: 4.5px solid #262a3a;   /* anel cinza-escuro (o "trilho") */
+  border-top-color: var(--accent); /* só o arco de cima brilha → dá a sensação de giro */
+  border-radius: 50%;            /* transforma em círculo perfeito */
+  animation: spin .9s linear infinite; /* gira para sempre, sem aceleração */
+}
+
+.loader__text {
+  font-size: .85rem;
+  letter-spacing: .08em;
+  color: var(--text);
+}
+
+/* Animação usada pelo spinner E pelos anéis do herói:
+   dar uma volta completa (de 0° a 360°) */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ======================================================================
+   CABEÇALHO FIXO
+   ----------------------------------------------------------------------
+   Fica sempre visível no topo. Começa "levemente translúcido" e ganha
+   fundo sólido + sombra quando o usuário rola (classe .scrolled via JS).
+   ====================================================================== */
+.nav {
+  position: fixed;               /* fixo no topo da janela */
+  top: 0; left: 0; right: 0;     /* estica de ponta a ponta */
+  z-index: 100;                  /* acima das seções, abaixo do loader */
+  background: rgba(21, 23, 33, .72); /* fundo escuro meio transparente */
+  backdrop-filter: blur(14px);   /* "vidro fosco": desfoca o que passa atrás */
+  border-bottom: 1px solid transparent; /* borda reservada (muda depois) */
+  transition:
+    background var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.nav.scrolled {                  /* estado "rolou a página" (via JS) */
+  background: rgba(13, 15, 22, .92);
+  border-bottom-color: var(--line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35); /* sombra suave para separar */
+}
+
+/* Linha interna: logo | links | botão, alinhados e com altura fixa */
+.nav__inner {
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;           /* centra na vertical */
+  justify-content: space-between; /* empurra logo p/ esquerda, links ao centro, botão p/ direita */
+  gap: 1rem;                     /* espaço mínimo entre os grupos */
+}
+
+/* Logotipo: quadradinho "</>" + nome */
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--title);
+}
+.nav__logo .mark {               /* o quadradinho verde "</>" */
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #06120c;
+  display: grid;
+  place-items: center;           /* centraliza o texto do símbolo */
+  font-size: .8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 12px var(--accent-soft); /* brilho sutil */
+}
+.nav__logo b {                   /* o ".dev" do nome */
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Lista de links do menu */
+.nav__links {
+  display: flex;
+  gap: 1.75rem;                  /* distância entre os links */
+  font-size: .92rem;
+}
+.nav__links a {
+  position: relative;            /* referência p/ o underline animado */
+  color: var(--text);
+  transition: color var(--duration) var(--ease);
+}
+/* O underline animado: uma barrinha de 2px que CRESCER da esquerda p/ direita */
+.nav__links a::after {
+  content: "";                   /* pseudo-elemento vazio (gerado pelo CSS) */
+  position: absolute;
+  left: 0;
+  bottom: -6px;                  /* logo abaixo do texto */
+  width: 0;                      /* começa escondido (largura zero) */
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width var(--duration) var(--ease);
+}
+.nav__links a:hover { color: var(--title); } /* texto clareia */
+.nav__links a:hover::after { width: 100%; }  /* barrinha cresce até o fim */
+
+/* ======================================================================
+   [EFEITO 3] BOTÕES ANIMADOS
+   ----------------------------------------------------------------------
+   Estado normal: pílula verde com brilho suave.
+   Hover: levanta 3px, o brilho aumenta e a cor acende.
+   Clique: dá um "afundadinha" rápida (feedback tátil visual).
+   ====================================================================== */
+.btn {
+  display: inline-flex;          /* alinha ícone/texto internamente */
+  align-items: center;
+  gap: .5rem;                    /* espaço entre texto e ícone, se houver */
+  padding: .85rem 1.6rem;        /* altura do botão e respiro lateral */
+  border-radius: 999px;          /* formato "pílula" (raio gigante) */
+  border: none;                  /* sem borda própria */
+  background: var(--accent);     /* fundo verde */
+  color: #06120c;                /* texto escuro (contraste no verde) */
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;               /* mãozinha no mouse */
+  box-shadow: 0 4px 16px var(--accent-soft);
+  transition:
+    transform var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease),
+    background var(--duration) var(--ease);
+}
+.btn:hover {                     /* estado de repouso NÃO: só com o mouse em cima */
+  transform: translateY(-3px);   /* negativa = sobe 3 pixels */
+  box-shadow: 0 10px 26px var(--accent-strong); /* brilho maior */
+  background: #0fd696;           /* cor ligeiramente mais clara */
+}
+.btn:active {                    /* enquanto o botão está sendo clicado */
+  transform: translateY(-1px) scale(.98); /* afunda e encolhe um tico */
+}
+
+/* Variante "fantasma": só contorno, sem preenchimento */
+.btn--ghost {
+  background: transparent;
+  color: var(--title);
+  border: 1.5px solid var(--line);
+  box-shadow: none;
+}
+.btn--ghost:hover {
+  border-color: var(--accent);   /* a borda acende na cor de destaque */
+  color: var(--accent);          /* o texto também */
+  transform: translateY(-3px);   /* mantém a mesma elevação */
+  box-shadow: 0 6px 18px var(--accent-soft);
+}
+
+/* Tamanhos extras */
+.btn--big { padding: 1.05rem 2.2rem; font-size: 1rem; }
+.btn--small { padding: .6rem 1.1rem; font-size: .85rem; }
+
+/* ======================================================================
+   HERÓI (primeira dobra)
+   ====================================================================== */
+.hero {
+  min-height: 100vh;             /* ocupa a tela inteira de altura */
+  display: grid;
+  align-items: center;           /* centra o conteúdo na vertical */
+  padding-top: var(--nav-h);     /* compensa a altura do cabeçalho fixo */
+  position: relative;
+}
+.hero::before {                  /* brilho circular decorativo atrás do texto */
+  content: "";
+  position: absolute;
+  right: -130px; top: -130px;    /* posicionado no canto superior direito */
+  width: 540px; height: 540px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-soft), transparent 65%);
+  pointer-events: none;          /* não atrapalha cliques */
+}
+.hero__grid {                    /* grade de 2 colunas no desktop */
+  display: grid;
+  grid-template-columns: 1fr;    /* mobile: tudo empilhado (1 coluna) */
+  gap: 2.5rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;                    /* acima do brilho decorativo */
+}
+@media (min-width: 900px) {      /* telas maiores: duas colunas */
+  .hero__grid { grid-template-columns: 1.15fr .85fr; }
+}
+
+.hero__subtitle { font-size: 1rem; }
+.hero__title {
+  font-size: clamp(2.6rem, 6vw, 4rem); /* fonte gigante que escala com a tela */
+  line-height: 1.05;                   /* entre-linhas apertado (título forte) */
+  font-weight: 700;
+  color: var(--title);
+  margin: .35rem 0;
+}
+.hero__education {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  color: var(--accent);                /* profissão em destaque */
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+.hero__desc {
+  max-width: 52ch;                     /* limita a largura do parágrafo */
+  margin-bottom: 1.75rem;
+}
+.hero__actions {                       /* faixa dos botões */
+  display: flex;
+  flex-wrap: wrap;                     /* se não couber, quebra linha */
+  gap: .9rem;                          /* distância entre botões */
+}
+
+/* --- Orbe decorativo do herói --- */
+.hero__visual { display: flex; justify-content: center; }
+
+.orb {                             /* recipiente quadrado do orbe */
+  position: relative;
+  width: min(340px, 72vw);         /* nunca maior que 340px nem 72% da tela */
+  aspect-ratio: 1;                 /* largura = altura → quadrado perfeito */
+  display: grid;
+  place-items: center;             /* centra os círculos filhos */
+}
+.orb::before {                     /* auréola difusa atrás de tudo */
+  content: "";
+  position: absolute;
+  inset: -12%;                     /* espalhado 12% além da borda */
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-soft), transparent 65%);
+  filter: blur(10px);              /* suaviza a luz */
+}
+.orb__ring {                        /* anel pontilhado girando devagar */
+  position: absolute;
+  inset: 0;                         /* ocupa o orbe inteiro */
+  border-radius: 50%;
+  border: 2px dashed rgba(0, 204, 143, .5);
+  animation: spin 36s linear infinite; /* UMA volta a cada 36 segundos */
+}
+.orb__ring--inner {                 /* segundo anel, menor, gira AO CONTRÁRIO */
+  inset: 16px;                      /* recuado 16px de cada lado */
+  border: 1.5px solid rgba(0, 204, 143, .28);
+  animation: spin 26s linear infinite reverse; /* "reverse" = sentido inverso */
+}
+.orb__core {                        /* núcleo central brilhante "</>" */
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #eafff5;
+  /* gradiente "esférico": clarão no alto à esquerda, sombra embaixo à direita */
+  background: radial-gradient(circle at 32% 28%, #0fe0a0, #0a8f63 55%, #063e2c 100%);
+  box-shadow:
+    0 0 50px rgba(0, 204, 143, .35),      /* brilho exterior */
+    inset 0 0 30px rgba(0, 0, 0, .35);    /* sombra interna (profundidade) */
+}
+
+/* ======================================================================
+   SEÇÃO "SOBRE" — estatísticas
+   ====================================================================== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* adapta às telas */
+  gap: 1rem;
+  margin-top: 2.25rem;
+}
+.stat {                            /* cada caixinha de número */
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1rem;
+  text-align: center;
+  transition:
+    transform var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.stat:hover {                      /* hover: levita e acende a borda */
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+.stat__num {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--accent);            /* os números brilham na cor de destaque */
+  line-height: 1.1;
+}
+.stat__label {
+  font-size: .86rem;
+  margin-top: .35rem;
+}
+
+/* ======================================================================
+   HABILIDADES — "pílulas" (chips)
+   ====================================================================== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;                 /* quebra em várias linhas se precisar */
+  gap: .6rem;                      /* espaço entre pílulas */
+  margin-top: 1.75rem;
+  justify-content: center;         /* centradas */
+}
+.chip {
+  padding: .55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  color: var(--title);
+  font-size: .88rem;
+  transition:
+    transform var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    background var(--duration) var(--ease);
+}
+.chip:hover {                      /* hover: sobe, borda acende, fundo esverdeia */
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* ======================================================================
+   [EFEITO 4] CARDS DE PROJETO
+   ----------------------------------------------------------------------
+   Normal: card escuro parado.
+   Hover: levanta 6px, borda acende e surge uma sombra profunda.
+   Detalhe: a seta "→" desliza para a direita junto com o hover.
+   ====================================================================== */
+.works {
+  display: grid;
+  grid-template-columns: 1fr;      /* mobile: coluna única */
+  gap: 1.25rem;
+  margin-top: 2.25rem;
+}
+@media (min-width: 700px) {
+  .works { grid-template-columns: repeat(3, 1fr); } /* desktop: 3 colunas */
+}
+
+.work {                            /* o card inteiro */
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;                /* corta qualquer filha que passe da borda */
+  transition:
+    transform var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.work:hover {                      /* o momento mágico 😉 */
+  transform: translateY(-6px);     /* levanta mais que os botões (destaque maior) */
+  border-color: var(--accent);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .45);
+}
+
+.work__cover {                     /* área "imagem" do card (gradiente + iniciais) */
+  height: 148px;
+  display: grid;
+  place-items: center;
+  font-family: ui-monospace, "Courier New", monospace; /* fonte mono (cara de código) */
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #d9ffe9;
+  background:
+    linear-gradient(135deg, var(--accent-soft), rgba(0, 204, 143, .04)),
+    var(--bg-soft);                /* gradiente por cima do fundo */
+  border-bottom: 1px solid var(--line);
+}
+.work__body {                      /* corpo do card (textos) */
+  padding: 1.15rem 1.2rem 1.3rem;
+}
+.work__title {                     /* nome do projeto */
+  color: var(--title);
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin-bottom: .35rem;
+}
+.work__desc {                      /* descrição curta */
+  font-size: .88rem;
+  margin-bottom: .8rem;
+}
+.work__tags {                      /* faixa de etiquetas */
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: .95rem;
+}
+.tag {                             /* etiqueta individual */
+  font-size: .72rem;
+  padding: .25rem .6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.work__link {                      /* link "Ver demo →" */
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.work__link .arr {                 /* a setinha tem transição própria */
+  transition: transform var(--duration) var(--ease);
+}
+.work:hover .arr {                 /* quando o CARD está no hover… */
+  transform: translateX(4px);      /* …a seta caminha para a direita */
+}
+
+/* ======================================================================
+   CONTATO
+   ====================================================================== */
+.contact { text-align: center; }
+
+.contact__box {                    /* caixa que envolve o convite */
+  position: relative;
+  overflow: hidden;                /* corta o brilho que vaza das bordas */
+  max-width: 680px;
+  margin-inline: auto;             /* centralizada */
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 8px); /* um pouco mais arredondada que o padrão */
+  padding: 2.75rem 1.5rem 2.25rem;
+}
+.contact__box::before {            /* clarão decorativo no topo da caixa */
+  content: "";
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);     /* centra o clarão horizontalmente */
+  width: 420px;
+  height: 220px;
+  background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+  pointer-events: none;
+}
+.contact__title {
+  color: var(--title);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 600;
+  margin-bottom: .6rem;
+  position: relative;              /* fica ACIMA do clarão (::before) */
+}
+.contact__text {
+  margin-bottom: 1.6rem;
+  position: relative;
+}
+.contact__note {
+  font-size: .8rem;
+  color: var(--text);
+  margin-top: 1rem;
+  position: relative;
+}
+
+/* Redes sociais (botões redondos tipo pílula) */
+.socials {
+  display: flex;
+  justify-content: center;
+  gap: .7rem;
+  margin-top: 1.75rem;
+  position: relative;
+}
+.social {
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  color: var(--title);
+  font-size: .84rem;
+  font-weight: 500;
+  transition:
+    transform var(--duration) var(--pop), /* ← aqui usamos a curva "pop" (pulinho) */
+    border-color var(--duration) var(--ease),
+    color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.social:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 6px 16px var(--accent-soft);
+}
+
+/* ======================================================================
+   RODAPÉ
+   ====================================================================== */
+.footer {
+  padding-block: 2rem;             /* respiro acima e abaixo */
+  text-align: center;
+  border-top: 1px solid var(--line); /* linha fina separadora */
+  font-size: .82rem;
+  color: var(--text);
+}
+.footer span { color: var(--accent); } /* o nome em destaque */
+
+/* ======================================================================
+   [EFEITO 2] REVELAÇÃO AO ROLAR (scroll reveal)
+   ----------------------------------------------------------------------
+   Como funciona:
+     1) Tudo que tem .reveal começa INVISÍVEL e 26px abaixo;
+     2) O JavaScript observa cada elemento; ao entrar na tela,
+        adiciona a classe .active;
+     3) Com transition, o elemento "sobe" e aparece suavemente.
+   As classes .d1…d6 adicionam atrasos de 0,1s em 0,1s — o famoso
+   efeito CASCATA (os itens aparecem em sequência, não de uma vez).
+   ====================================================================== */
+.reveal {
+  opacity: 0;                      /* completamente invisível */
+  transform: translateY(26px);     /* e deslocado 26px para baixo */
+  transition:
+    opacity .6s var(--ease),
+    transform .6s var(--ease);     /* ao aparecer, ambos se suavizam */
+}
+.reveal.active {                   /* estado aplicado pelo JavaScript */
+  opacity: 1;                      /* visível… */
+  transform: none;                 /* de volta à posição natural */
+}
+
+/* Escala de atrasos — aplicada junto com .reveal no HTML (class="reveal d1") */
+.d1 { transition-delay: .10s; }    /* espera 0,1s antes de aparecer */
+.d2 { transition-delay: .20s; }
+.d3 { transition-delay: .30s; }
+.d4 { transition-delay: .40s; }
+.d5 { transition-delay: .50s; }
+.d6 { transition-delay: .60s; }
+
+/* ======================================================================
+   [EFEITO 5] ACESSIBILIDADE — usuários que pedem menos movimento
+   ----------------------------------------------------------------------
+   Quem ativa "reduzir movimento" no sistema operacional vê tudo pronto,
+   sem nenhuma animação: respeitamos a preferência do usuário.
+   ====================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;    /* nenhum @keyframes roda */
+    transition: none !important;   /* nenhuma transição anima */
+  }
+  html { scroll-behavior: auto; }  /* rolagem volta a ser instantânea */
+  .reveal {                        /* garante que nada fique escondido… */
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,17 +1,239 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="CSS/style.css">
+  <!-- ========== O QUE É CADA LINHA DESTA PARTE (o "head") ========== -->
+  <meta charset="UTF-8">                                  <!-- aceita acentos: ã, ç, é… -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ajusta o zoom ao tamanho da tela -->
+  <title>Portfólio Animado · Bruno Alves</title>         <!-- nome da aba do navegador -->
+
+  <!-- Fonte Poppins (precisa de internet; sem ela, usa a fonte do sistema) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ PONTE PARA O CSS EXTERNO: o estilo vive no arquivo style.css -->
+  <link rel="stylesheet" href="CSS/style.css">
+
+  <!-- Segurança: se o JavaScript estiver desligado no navegador,
+       os elementos .reveal ficam visíveis mesmo sem animação. -->
+  <noscript><style>.reveal { opacity: 1; transform: none; }</style></noscript>
 </head>
+
 <body>
-    <!---TELA DE CARREGAMENTO--->
-    <div class="loader" aria-hidden="true">
-        <div class="spinner"></div>
-        <p class="loader_text">Carregamento...</p>
+
+<!-- =====================================================================
+     [EFEITO 1] LOADER — tela de carregamento
+     Spinner girando enquanto a página carrega. Quando tudo termina, o
+     JavaScript adiciona .hide => a tela faz fade e revela o site.
+     ===================================================================== -->
+<div id="loader" aria-hidden="true">
+  <div class="spinner"></div>                    <!-- o círculo girando -->
+  <p class="loader__text">Carregando…</p>        <!-- textinho abaixo -->
+</div>
+
+<!-- =====================================================================
+     CABEÇALHO — fixo no topo; ganha fundo mais escuro quando rola (JS)
+     ===================================================================== -->
+<header class="nav" id="nav">
+  <div class="nav__inner container">
+
+    <!-- Logotipo: "</>" dentro de um quadradinho verde + nome -->
+    <a href="#home" class="nav__logo">
+      <span class="mark">&lt;/&gt;</span> João<b>.dev</b>
+    </a>
+
+    <!-- Links de navegação: cada âncora (#about etc.) rola até a seção -->
+    <nav class="nav__links" aria-label="Menu principal">
+      <a href="#about">Sobre</a>
+      <a href="#skills">Habilidades</a>
+      <a href="#works">Projetos</a>
+      <a href="#contact">Contato</a>
+    </nav>
+
+    <!-- Botão de ação (estilo vem do CSS pela classe .btn) -->
+    <a href="#contact" class="btn btn--small">Fale comigo</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ==================================================================
+       HERÓI — primeira dobra da página (aparece logo ao entrar)
+       Os itens usam .reveal + .d1/.d2/… para surgirem em cascata.
+       ================================================================== -->
+  <section class="hero section" id="home">
+    <div class="container hero__grid">
+
+      <!-- Coluna da esquerda: textos e botões -->
+      <div>
+        <p class="hero__subtitle reveal">Olá, eu sou</p>            <!-- linha 1 da cascata -->
+        <h1 class="hero__title reveal d1">João Victor</h1>         <!-- linha 2 (atraso d1) -->
+        <h2 class="hero__education reveal d2">Desenvolvedor Front-end</h2> <!-- linha 3 (d2) -->
+        <p class="hero__desc reveal d3">
+          Transformo ideias em interfaces modernas e cheias de personalidade.
+          Curto animações, detalhes bem-feitos e código limpo.
+        </p>
+        <div class="hero__actions reveal d4">                       <!-- linha 4 (d3) -->
+          <a href="#works" class="btn">Ver projetos</a>              <!-- botão primário -->
+          <a href="#contact" class="btn btn--ghost">Fale comigo</a>  <!-- botão "fantasma" (só contorno) -->
+        </div>
+      </div>
+
+      <!-- Coluna da direita: orbe decorativo
+           (núcleo brilhante + dois anéis girando devagar) -->
+      <div class="hero__visual reveal d3">
+        <div class="orb">
+          <div class="orb__ring"></div>                 <!-- anel pontilhado externo -->
+          <div class="orb__ring orb__ring--inner"></div><!-- anel interno, gira ao contrário -->
+          <div class="orb__core">&lt;/&gt;</div>        <!-- núcleo com o símbolo de código -->
+        </div>
+      </div>
+
     </div>
-    <script src="JS/javascript.js"></script>
+  </section>
+
+  <!-- ==================================================================
+       SOBRE — apresentação + estatísticas (cards que sobem no hover)
+       ================================================================== -->
+  <section class="section" id="about">
+    <div class="container">
+      <p class="section__subtitle reveal">Sobre <span>mim</span></p>   <!-- rótulo colorido -->
+      <h2 class="section__title reveal d1">Quem eu sou</h2>            <!-- título da seção -->
+      <p class="section__lead reveal d2">
+        Sou desenvolvedor front-end apaixonado por criar experiências digitais
+        fluidas e agradáveis. Trabalho com HTML, CSS e JavaScript todos os dias,
+        e estou sempre estudando novas formas de deixar a web mais viva.
+      </p>
+
+      <!-- Três mini-cards de números -->
+      <div class="stats">
+        <div class="stat reveal d2">
+          <p class="stat__num">04+</p>
+          <p class="stat__label">Anos de experiência</p>
+        </div>
+        <div class="stat reveal d3">
+          <p class="stat__num">30+</p>
+          <p class="stat__label">Projetos entregues</p>
+        </div>
+        <div class="stat reveal d4">
+          <p class="stat__num">12</p>
+          <p class="stat__label">Clientes satisfeitos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       HABILIDADES — "pílulas" que reagem ao mouse
+       ================================================================== -->
+  <section class="section" id="skills">
+    <div class="container" style="text-align:center">
+      <p class="section__subtitle reveal">Minhas <span>habilidades</span></p>
+      <h2 class="section__title reveal d1">O que eu uso no dia a dia</h2>
+
+      <div class="chips">
+        <span class="chip reveal d1">HTML5</span>
+        <span class="chip reveal d2">CSS3</span>
+        <span class="chip reveal d3">JavaScript</span>
+        <span class="chip reveal d4">React</span>
+        <span class="chip reveal d5">Node.js</span>
+        <span class="chip reveal d6">Git &amp; GitHub</span>
+        <span class="chip reveal d6">Figma</span>
+        <span class="chip reveal d6">SQL</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       [EFEITO 4] PROJETOS — cards que levantam no hover
+       ================================================================== -->
+  <section class="section" id="works">
+    <div class="container">
+      <p class="section__subtitle reveal">Trabalhos <span>recentes</span></p>
+      <h2 class="section__title reveal d1">Projetos selecionados</h2>
+
+      <div class="works">
+
+        <!-- Card 1 -->
+        <article class="work reveal d1">
+          <div class="work__cover">NL</div>            <!-- "capa" com as iniciais -->
+          <div class="work__body">
+            <h3 class="work__title">Nova Landing</h3>
+            <p class="work__desc">Página de vendas para startup de tecnologia, com animações suaves ao rolar.</p>
+            <div class="work__tags">
+              <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+            </div>
+            <a href="#" class="work__link">Ver demo <span class="arr">→</span></a> <!-- a setinha anda no hover -->
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="work reveal d2">
+          <div class="work__cover">DP</div>
+          <div class="work__body">
+            <h3 class="work__title">Dashboard Pulse</h3>
+            <p class="work__desc">Painel administrativo com gráficos interativos e tema escuro.</p>
+            <div class="work__tags">
+              <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">APIs</span>
+            </div>
+            <a href="#" class="work__link">Ver demo <span class="arr">→</span></a>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="work reveal d3">
+          <div class="work__cover">PV</div>
+          <div class="work__body">
+            <h3 class="work__title">Portfólio Vibe</h3>
+            <p class="work__desc">Site de portfólio cheio de microinterações e carregamento animado.</p>
+            <div class="work__tags">
+              <span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">UI/UX</span>
+            </div>
+            <a href="#" class="work__link">Ver demo <span class="arr">→</span></a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       CONTATO — caixa com brilho e botões (redes sociais)
+       ================================================================== -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="contact__box reveal">
+        <h2 class="contact__title">Vamos criar algo juntos?</h2>
+        <p class="contact__text">
+          Tem uma ideia, um projeto ou só quer trocar uma ideia? Meu inbox está aberto.
+        </p>
+        <a href="mailto:ola@bruno.dev" class="btn btn--big">Enviar mensagem</a>
+        <p class="contact__note">Respondo normalmente em até 24 horas.</p>
+
+        <div class="socials">
+          <a href="#" class="social">GitHub</a>      <!-- troque pelos seus perfis -->
+          <a href="#" class="social">LinkedIn</a>
+          <a href="#" class="social">Dribbble</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ====================================================================
+     RODAPÉ — assinatura no fim da página
+     ==================================================================== -->
+<footer class="footer">
+  <div class="container">
+    © 2026 <span>Bruno Alves</span> · Feito com HTML, CSS e muito ☕
+  </div>
+</footer>
+
+<!-- ✅ PONTE PARA O JS EXTERNO: o comportamento vive no script.js.
+     Fica no FIM do body para que todo o HTML já exista quando o script
+     rodar (essa é a ordem recomendada de carregamento). -->
+<script src="JS/javascript.js"></script>
+
 </body>
 </html>
